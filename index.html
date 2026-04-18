@@ -442,13 +442,40 @@
 
             solve(keys) {
                 const w = keys.indexOf('wake'), e = keys.indexOf('eat'), tr = keys.indexOf('travel'), s = keys.indexOf('study'), ts = keys.indexOf('test');
-                if (w > e) return { title: "【深潜幻象】", bio: "未觉醒而食其灵，幻化巨螯巡海。", success: false };
-                if (w > tr) return { title: "【幽灵行军】", bio: "甲壳未启，幽影先行，误入莲池共舞。", success: false };
-                if (s < tr) return { title: "【虚空乱扣】", bio: "未至书院而演阵，生铁煮而为饼。", success: false };
-                if (ts < s) return { title: "【神兽之吻】", bio: "反成麒麟之磨牙玩偶。", success: false };
-                if (s < e) return { title: "【云端梦呓】", bio: "灵力匮乏，1+1 等于一朵云。", success: false };
-                if (w === 0 && s > 2 && ts === 4) return { title: "【逻辑圆满】", bio: "因果通达，甲兵大成。", success: true };
-                return { title: "【混沌微澜】", bio: "序虽乱，然平衡自现。", success: false };
+                const audit = this.auditLogic(keys);
+                
+                // 结果架构优化：根据得分与核心缺陷组合生成唯一标题
+                if (audit.score >= 90) return { title: "【天道逻辑】", bio: "因果通达，甲兵大成。算力覆盖全域，天道亦为之感应。", success: true };
+                
+                let title = "【混沌分支】", bio = "";
+                const primaryFlaw = audit.flaws[0] || "逻辑微调";
+                
+                // 建立“主缺陷 -> 标题”映射
+                const titleMap = {
+                    "意识迟滞": "【梦境滞留】", "梦中进食(悖论)": "【虚空反噬】", 
+                    "盲目推演": "【地缘迷失】", "鲁莽应战": "【溃败契机】",
+                    "因果倒置": "【时空陷阱】"
+                };
+                title = titleMap[primaryFlaw] || "【逻辑裂隙】";
+                
+                // 组合 Bio 描述，使其具有唯一性
+                const bioPool = {
+                    "意识迟滞": "神魂未启，感知被时空洪流裹挟。",
+                    "梦中进食(悖论)": "于梦中汲取灵气，导致躯壳逻辑崩坏。",
+                    "盲目推演": "未至书院而妄图窥天，节点衔接断裂。",
+                    "鲁莽应战": "算力未逮而轻言战事，反受其乱。",
+                    "坐标稳固": "虽坐标稳固，然内核逻辑仍存破绽。"
+                };
+                
+                bio = audit.flaws.map(f => bioPool[f] || f).join(" ");
+                if (audit.score < 30) { title = "【深度悖论】"; bio = "因果全线崩塌，时空支流已沦为虚无。"; }
+                
+                // 增加序列指纹，确保即使同一标题下的描述也略有差异
+                const signature = keys.join('').length % 3;
+                const variants = [" (观测态-α)", " (观测态-β)", " (观测态-γ)"];
+                title += variants[signature];
+
+                return { title, bio, success: false };
             },
 
             saveSnapshot(keys, result) {
@@ -594,15 +621,28 @@
             auditLogic(keys) {
                 if (keys.length === 0) return { merits: [], flaws: [], score: 0 };
                 const w = keys.indexOf('wake'), e = keys.indexOf('eat'), tr = keys.indexOf('travel'), s = keys.indexOf('study'), ts = keys.indexOf('test');
-                let merits = [], flaws = [], score = 50;
+                let merits = [], flaws = [], score = 50.0;
+                const source = document.getElementById('source');
 
-                if (w === 0) { merits.push("觉醒前置"); score += 20; } else { flaws.push("意识迟滞"); score -= 20; }
-                if (w < e && w !== -1) merits.push("灵力充沛"); else if (e !== -1) { flaws.push("梦中进食(悖论)"); score -= 15; }
-                if (tr < s && tr !== -1) merits.push("坐标稳固"); else if (s !== -1) { flaws.push("盲目推演"); score -= 15; }
-                if (s < ts && s !== -1) merits.push("算力覆盖"); else if (ts !== -1) { flaws.push("鲁莽应战"); score -= 10; }
-                if (keys.length === 5) score += 10;
+                // 核心因果链校验 (权重最高)
+                if (w === 0) { merits.push("觉醒前置"); score += 20; } else { flaws.push("意识迟滞"); score -= 15 + w * 2; }
+                if (w < e && w !== -1 && e !== -1) { merits.push("灵力充沛"); score += 10; } 
+                else if (e !== -1) { flaws.push("梦中进食(悖论)"); score -= 15; }
 
-                return { merits, flaws, score };
+                if (tr < s && tr !== -1 && s !== -1) { merits.push("坐标稳固"); score += 10; } 
+                else if (s !== -1) { flaws.push("盲目推演"); score -= 15; }
+
+                if (s < ts && s !== -1 && ts !== -1) { merits.push("算力覆盖"); score += 10; } 
+                else if (ts !== -1) { flaws.push("鲁莽应战"); score -= 15; }
+
+                // 次级序位精度校验 (0.1 ~ 0.9 浮点精度，确保唯一性)
+                const precision = (w * 0.1) + (e * 0.05) + (tr * 0.02) + (s * 0.01);
+                score = Math.max(0, Math.min(100, score + precision));
+
+                // 检查全量参与
+                if (keys.length === 5) score += 5;
+
+                return { merits, flaws, score: parseFloat(score.toFixed(1)) };
             }
         };
 
