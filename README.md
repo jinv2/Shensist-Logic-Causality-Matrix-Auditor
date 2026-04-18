@@ -1,6 +1,8 @@
 # Shensist-Logic-Causality-Matrix-Auditor
 
-![Shensist Matrix Banner](assets/logo_ts.webp)
+<p align="center">
+  <img src="assets/logo_ts.webp" width="160">
+</p>
 
 > [!CAUTION]
 > **PROPRIETARY & CONFIDENTIAL / 版权所有 · 严禁盗用**
