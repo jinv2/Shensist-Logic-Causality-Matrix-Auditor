@@ -246,6 +246,77 @@
         @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; } }
         @keyframes pop { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+        /* 手机端自适应调整 */
+        @media screen and (max-width: 768px) {
+            body {
+                flex-direction: column;
+                height: auto;
+                overflow-y: auto;
+            }
+
+            .agent-pane {
+                width: 100%;
+                height: auto;
+                border-right: none;
+                border-bottom: 4px solid var(--gold);
+                padding: 15px;
+            }
+
+            .avatar-container {
+                height: 120px;
+                width: 120px;
+                margin: 0 auto 15px;
+            }
+
+            .agent-name, .agent-role {
+                text-align: center;
+            }
+
+            .reasoning-terminal {
+                height: 120px;
+            }
+
+            .main-workflow {
+                padding: 20px 10px;
+            }
+
+            h1 {
+                font-size: 1.6rem;
+            }
+
+            .source-grid {
+                gap: 8px;
+            }
+
+            .scene-card {
+                width: 80px;
+                height: 80px;
+            }
+
+            .card-label {
+                font-size: 0.6rem;
+            }
+
+            .target-workspace {
+                height: 120px;
+            }
+
+            #agent-bubble {
+                left: 20px;
+                top: auto;
+                bottom: 20px;
+                max-width: calc(100% - 40px);
+            }
+            #agent-bubble::after {
+                display: none;
+            }
+
+            #tutorial-btn {
+                top: 10px;
+                right: 10px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -293,9 +364,11 @@
     </div>
 
     <div class="agent-pane">
-        <div class="logo-frame">
-            <img src="assets/logo_ts.webp">
-        </div>
+        <a href="https://shensist.top/" target="_blank" class="logo-link">
+            <div class="logo-frame">
+                <img src="assets/logo_ts.webp">
+            </div>
+        </a>
         <div class="avatar-container">
             <img src="assets/1. 系统重启（起床）.webp" id="agent-avatar">
             <div class="status-dot"></div>
