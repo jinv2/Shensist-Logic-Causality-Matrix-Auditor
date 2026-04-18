@@ -557,24 +557,35 @@
                     cont.innerHTML += html;
                 };
 
-                // 清理旧渲染
+                // 清理旧渲染并填充审计摘要
                 renderAudit(auditA, 'insight-current-seq');
                 renderAudit(auditB, 'insight-snapshot-seq');
 
                 if (current.length === 0) return "当前矩阵尚为空。快照显示了之前的因果链路，建议先编排一个新序列。";
+                
+                // 寻找第一个不同点
+                let diffIdx = -1;
+                for(let i=0; i<5; i++) { if(current[i] !== snapshot[i]) { diffIdx = i; break; } }
+                
+                if (diffIdx === -1) return "<strong>时空同步：完美镜像</strong><br>两组序列在因果拓扑上百分之百一致，逻辑已经达成同频。";
 
                 let advice = "";
+                const source = document.getElementById('source');
+                const nodeA = source.querySelector(`[data-key="${current[diffIdx]}"]`)?.dataset.name || current[diffIdx];
+                const nodeB = source.querySelector(`[data-key="${snapshot[diffIdx]}"]`)?.dataset.name || snapshot[diffIdx];
+
                 if (auditA.score > auditB.score) {
-                    advice = `<strong>胜出路径：当前时空 (Score: ${auditA.score})</strong><br>相比于快照版本，当前序列在关键因果节点上更趋近天道。`;
+                    advice = `<strong>胜出路径：当前时空 (Score: ${auditA.score})</strong><br>关键差异在于节点 [${diffIdx + 1}]：当前为 [${nodeA}]，优于快照的 [${nodeB}]。这使得整体因果链更趋近逻辑闭环。`;
                 } else if (auditA.score < auditB.score) {
-                    advice = `<strong>胜出路径：快照时空 (Score: ${auditB.score})</strong><br>快照版本展现了更成熟的逻辑闭环。当前序列在核心节点衔接上存在倒置，建议参考快照的拓扑结构。`;
+                    advice = `<strong>胜出路径：快照时空 (Score: ${auditB.score})</strong><br>快照版本展现了更成熟的逻辑。建议通过调整节点 [${diffIdx + 1}] 的排列，参考快照中的 [${nodeB}] 结构来修复当前逻辑崩坏。`;
                 } else {
-                    advice = "<strong>均势状态：双核并行</strong><br>两组序列展现了不同的逻辑取向，但皆未能突破思维瓶颈。";
+                    advice = `<strong>逻辑博弈：异途同归 (Tie: ${auditA.score})</strong><br>虽然得分一致，但解构不同。对比节点 [${diffIdx + 1}]，快照选择了 [${nodeB}] 而当前为 [${nodeA}]。两者的 [${auditA.merits[0] || '逻辑核心'}] 各有千秋，但皆存在进一步优化的空间。`;
                 }
 
-                // 具体修正建议
+                // 针对性缺陷修复建议
                 if (auditA.flaws.length > 0) {
-                    advice += `<br><br><strong>修正指令：</strong> 建议纠正 [${auditA.flaws[0]}] 涉及的节点，尝试建立更稳固的因果锚点。`;
+                    const targetFlaw = auditA.flaws[0];
+                    advice += `<br><br><strong>修正指令：</strong> 系统检测到 [${targetFlaw}]。建议立即审查 [${nodeA}] 与前置节点的序位关系，消除因果悖论。`;
                 }
                 
                 return advice;
