@@ -115,7 +115,9 @@
             background: white; border-radius: 10px; cursor: grab;
             transition: all 0.3s; border: 1px solid #ddd; overflow: hidden;
             box-shadow: 0 4px 10px var(--shadow);
+            user-select: none; -webkit-user-select: none; -webkit-touch-callout: none;
         }
+        .scene-card:active { transform: scale(0.95); transition: 0.1s; }
         .scene-card:hover { transform: scale(1.1); border-color: var(--gold); z-index: 100; }
         .scene-card img { width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
         .card-label {
@@ -408,7 +410,7 @@
         </div>
 
         <div class="target-workspace" id="target">
-            <div class="workspace-hint">拖拽因果节点至此矩阵区域...</div>
+            <div class="workspace-hint">拖拽或点击因果节点至此矩阵区域...</div>
         </div>
 
         <!-- 因果启示录 (Insight Panel) -->
