@@ -1,0 +1,14 @@
+# OS files
+.DS_Store
+Thumbs.db
+
+# Project files
+.vscode/
+.idea/
+
+# Shensist Meta
+.gemini/
+/brain/
+task.md
+implementation_plan.md
+walkthrough.md
